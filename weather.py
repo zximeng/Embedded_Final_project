@@ -9,5 +9,11 @@ print(str(temp)[:5]+ 'C')
 hum = data['main']['humidity']
 print(hum)
 
-
 api = 'https://api.openweathermap.org/data/2.5/onecall?lat=-76.5&lon=42.44&appid=818eb27f395ca0f860e5ce34fedade0f'
+data = requests.get(api).json()
+for i in range(0,7):
+    weather = data['daily'][i]['weather'][0]['main']
+    print(i)
+    temp = data['daily'][i]['temp']['day']
+    print(weather)
+    print(temp)
