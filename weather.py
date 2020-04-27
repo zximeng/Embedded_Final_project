@@ -17,3 +17,7 @@ for i in range(0,7):
     temp = data['daily'][i]['temp']['day']
     print(weather)
     print(temp)
+
+import time
+
+currenttime = str(time.ctime()).split(' ')
