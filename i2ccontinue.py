@@ -58,13 +58,9 @@ def one_shot_read():
 	bus.write_byte_data(0x6a,FUNC,0x40)
 	bus.write_byte_data(0x6a,MAST,0x08)
 	time.sleep(0.0003)
-	accx = [1]*6
-	accx[0] = bus.read_byte_data(0x6a,SENSOR_1)
-	accx[1] = bus.read_byte_data(0x6a,0x03)
-	accx[2] = bus.read_byte_data(0x6a,0x04)
-	accx[3] = bus.read_byte_data(0x6a,0x05)
-	accx[4] = bus.read_byte_data(0x6a,0x06)
-	accx[5] = bus.read_byte_data(0x6a,0x07)
+	accx = [0]*6
+
+	accx = bus.read_i2c_block_data(0x6a,SENSOR_1,6)
 
 	bus.write_byte_data(0x6a,FUNC,0x00)
 	return accx
@@ -87,12 +83,9 @@ def read_data(register):
 
 
 
-for i in range(0,1):
+for i in range(0,10):
+	print('this is the start of reading ')
 	
-
-	X = one_shot_read()
-	print(X)
-	read_data(ACCX)
-	read_data(ACCY)
-	read_data(ACCZ)
-
+	IMU1 = bus.read_i2c_block_data(0x6a,ACCX,6)
+	IMU2 = one_shot_read()
+	print(IMU2)
