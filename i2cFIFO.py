@@ -1,6 +1,8 @@
 
 import smbus
 import time
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 bus = smbus.SMBus(1)
 addr = 0x6a
 # master SD0 connected to GND
@@ -79,16 +81,51 @@ def read_data(register):
 
 one_shot_read()
 
+data1_count = 0
+data2_count = 0
+x1_axis = []
+x2_axis = []
+Z1_vals = []
+Z2_vals = []
+Z1_lowpass = [0,0,0,0,0,0,0,0,0,0]
+Z2_lowpass = [0,0,0,0,0,0,0,0,0,0]
+def animate(i):
+	count = 1
+	level = 1
+	#f= open("output.txt","w+")
+	global data1_count
+	global data2_count
 
-count = 700
-while ( count) :
-	level = bus.read_byte_data(0x6a,0x3A)
-	print(level)
-	IMU2 = bus.read_i2c_block_data(0x6a,0x78,7)
-	print(IMU2)
-	if IMU2[0] == 17 or  IMU2[0] == 18 or  IMU2[0] == 20 or  IMU2[0] == 23 :
-		print('fount the great treasure')
+	while ( count <= 300) :
+		level = bus.read_byte_data(0x6a,0x3A)
+		IMU2 = bus.read_i2c_block_data(0x6a,0x78,7)
+		print(IMU2)
+		#f.write(str(IMU2) + "\n")
+		if IMU2[0] == 17 or  IMU2[0] == 18 or  IMU2[0] == 20 or  IMU2[0] == 23 :
+			Z1_lowpass.pop(0)
+			Z1_lowpass.append(IMU2[6])
+			data = sum(Z1_lowpass) / 10
+			Z1_vals.append(data)
+			x1_axis.append(data1_count)
+			data1_count +=1
+		else:
+			Z2_lowpass.pop(0)
+			Z2_lowpass.append(IMU2[6])
+			data = sum(Z2_lowpass) / 10
+			Z2_vals.append(data)
+			x2_axis.append(data2_count)
+			data2_count +=1
+		count +=1
+	plt.cla()
+	plt.plot(x1_axis,Z1_vals,label = 'IMU1 DATA')
+	plt.plot(x2_axis,Z2_vals,label = 'IMU2 DATA')
+	plt.legend(loc='upper left')
+	plt.tight_layout()
+		
+ani = FuncAnimation(plt.gcf(),animate,interval=300)
 
-	count -=1
+plt.tight_layout()
+plt.show()
 
+#f.close()
 
