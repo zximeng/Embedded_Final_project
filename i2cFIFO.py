@@ -89,6 +89,14 @@ Z1_vals = []
 Z2_vals = []
 Z1_lowpass = [0,0,0,0,0,0,0,0,0,0]
 Z2_lowpass = [0,0,0,0,0,0,0,0,0,0]
+X1_vals = []
+X2_vals = []
+X1_lowpass = [0,0,0,0,0,0,0,0,0,0]
+X2_lowpass = [0,0,0,0,0,0,0,0,0,0]
+Y1_vals = []
+Y2_vals = []
+Y1_lowpass = [0,0,0,0,0,0,0,0,0,0]
+Y2_lowpass = [0,0,0,0,0,0,0,0,0,0]
 def animate(i):
 	count = 1
 	level = 1
@@ -96,33 +104,71 @@ def animate(i):
 	global data1_count
 	global data2_count
 
-	while ( count <= 300) :
+	while ( count <= 100) :
 		level = bus.read_byte_data(0x6a,0x3A)
+		print(level)
 		IMU2 = bus.read_i2c_block_data(0x6a,0x78,7)
 		print(IMU2)
 		#f.write(str(IMU2) + "\n")
-		if IMU2[0] == 17 or  IMU2[0] == 18 or  IMU2[0] == 20 or  IMU2[0] == 23 :
-			Z1_lowpass.pop(0)
-			Z1_lowpass.append(IMU2[6])
-			data = sum(Z1_lowpass) / 10
-			Z1_vals.append(data)
-			x1_axis.append(data1_count)
-			data1_count +=1
-		else:
-			Z2_lowpass.pop(0)
-			Z2_lowpass.append(IMU2[6])
-			data = sum(Z2_lowpass) / 10
-			Z2_vals.append(data)
-			x2_axis.append(data2_count)
-			data2_count +=1
-		count +=1
+		if IMU2[6] != 255 and IMU2[6] != 253:
+			if IMU2[0] == 17 or  IMU2[0] == 18 or  IMU2[0] == 20 or  IMU2[0] == 23 :
+				Z1_lowpass.pop(0)
+				Z1_lowpass.append(IMU2[6])
+				data = sum(Z1_lowpass) / 10
+				Z1_vals.append(data)
+				X1_lowpass.pop(0)
+				X1_lowpass.append(IMU2[2])
+				data = sum(X1_lowpass) / 10
+				X1_vals.append(data)
+				Y1_lowpass.pop(0)
+				Y1_lowpass.append(IMU2[4])
+				data = sum(Y1_lowpass) / 10
+				Y1_vals.append(data)
+				x1_axis.append(data1_count)
+				data1_count +=1
+			else:
+				Z2_lowpass.pop(0)
+				Z2_lowpass.append(IMU2[6])
+				data = sum(Z2_lowpass) / 10
+				Z2_vals.append(data)
+				X2_lowpass.pop(0)
+				X2_lowpass.append(IMU2[2])
+				data = sum(X2_lowpass) / 10
+				X2_vals.append(data)
+				Y2_lowpass.pop(0)
+				Y2_lowpass.append(IMU2[4])
+				data = sum(Y2_lowpass) / 10
+				Y2_vals.append(data)
+				x2_axis.append(data2_count)
+				data2_count +=1
+			count +=1
 	plt.cla()
-	plt.plot(x1_axis,Z1_vals,label = 'IMU1 DATA')
-	plt.plot(x2_axis,Z2_vals,label = 'IMU2 DATA')
-	plt.legend(loc='upper left')
-	plt.tight_layout()
+	plt.subplot(231)
+	plt.plot(x1_axis,X1_vals,label = 'IMU1 X')
+	plt.title('IMU1 X')
+	plt.subplot(232)
+	plt.plot(x1_axis,Y1_vals,label = 'IMU1 Y')
+	plt.title('IMU1 Y')
+
+	plt.subplot(233)
+	plt.plot(x1_axis,Z1_vals,label = 'IMU1 Z')
+	plt.title('IMU1 Z')
+
+	plt.subplot(234)
+	plt.plot(x2_axis,X2_vals,label = 'IMU2 X')
+	plt.title('IMU2 X')
+
+	plt.subplot(235)
+	plt.plot(x2_axis,Y2_vals,label = 'IMU2 Y')
+	plt.title('IMU2 Y')
+
+	plt.subplot(236)
+	plt.plot(x2_axis,Z2_vals,label = 'IMU2 Z')
+	plt.title('IMU2 Z')
+	#plt.legend(loc='upper left')
+	#plt.tight_layout()
 		
-ani = FuncAnimation(plt.gcf(),animate,interval=300)
+ani = FuncAnimation(plt.gcf(),animate,interval=1000)
 
 plt.tight_layout()
 plt.show()
