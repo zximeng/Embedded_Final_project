@@ -106,37 +106,65 @@ def animate(i):
 
 	while ( count <= 100) :
 		level = bus.read_byte_data(0x6a,0x3A)
-		print(level)
+		
 		IMU2 = bus.read_i2c_block_data(0x6a,0x78,7)
 		print(IMU2)
 		#f.write(str(IMU2) + "\n")
 		if IMU2[6] != 255 and IMU2[6] != 253:
+			if len(hex(IMU2[5])) == 3:
+				z_data = int(hex(IMU2[6])[2:]+'0'+ hex(IMU2[5])[2:],16)
+			else:
+				z_data = int(hex(IMU2[6])[2:]+ hex(IMU2[5])[2:],16)
+			if z_data < 32768:
+				z_data = z_data / 16391
+			else:
+				z_data = (z_data - 65535) / 16391
+			if len(hex(IMU2[1])) == 3:
+				x_data = int(hex(IMU2[2])[2:]+ '0'+ hex(IMU2[1])[2:],16)
+			else:
+				x_data = int(hex(IMU2[2])[2:]+ hex(IMU2[1])[2:],16)
+			
+			if x_data < 32768:
+				x_data = x_data / 16391
+			else:
+				x_data = (x_data - 65535) / 16391
+			if len(hex(IMU2[3])) == 3:
+				y_data = int(hex(IMU2[4])[2:]+'0'+ hex(IMU2[3])[2:],16)
+			else:
+				y_data = int(hex(IMU2[4])[2:]+ hex(IMU2[3])[2:],16)
+			
+			if y_data < 32768:
+				y_data = y_data / 16391
+			else:
+				y_data = (y_data - 65535) / 16391
+			print(str(x_data) + ' ' + str(y_data) + ' ' + str(z_data))
 			if IMU2[0] == 17 or  IMU2[0] == 18 or  IMU2[0] == 20 or  IMU2[0] == 23 :
 				Z1_lowpass.pop(0)
-				Z1_lowpass.append(IMU2[6])
+				Z1_lowpass.append(z_data)
 				data = sum(Z1_lowpass) / 10
 				Z1_vals.append(data)
 				X1_lowpass.pop(0)
-				X1_lowpass.append(IMU2[2])
+				X1_lowpass.append(x_data)
 				data = sum(X1_lowpass) / 10
 				X1_vals.append(data)
 				Y1_lowpass.pop(0)
-				Y1_lowpass.append(IMU2[4])
+				Y1_lowpass.append(y_data)
 				data = sum(Y1_lowpass) / 10
 				Y1_vals.append(data)
 				x1_axis.append(data1_count)
 				data1_count +=1
-			else:
+			elif IMU2[0] == 113 or  IMU2[0] == 114 or  IMU2[0] == 116 or  IMU2[0] == 119 :
+				
 				Z2_lowpass.pop(0)
-				Z2_lowpass.append(IMU2[6])
+				Z2_lowpass.append(z_data)
 				data = sum(Z2_lowpass) / 10
 				Z2_vals.append(data)
 				X2_lowpass.pop(0)
-				X2_lowpass.append(IMU2[2])
+				X2_lowpass.append(x_data)
 				data = sum(X2_lowpass) / 10
 				X2_vals.append(data)
 				Y2_lowpass.pop(0)
-				Y2_lowpass.append(IMU2[4])
+				Y2_lowpass.append(y_data)
 				data = sum(Y2_lowpass) / 10
 				Y2_vals.append(data)
 				x2_axis.append(data2_count)
