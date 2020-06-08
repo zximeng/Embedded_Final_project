@@ -1,5 +1,6 @@
 # Embedded_Final_project
-
+Demo Video: https://www.youtube.com/watch?v=HzQzxp2fkk8
+Project Site: https://bit.ly/2XPM2Vg
 This project is the final project for ECE5725 class. 
 
 It would use PiTFT as the main interface where user can see informations about the home and have some controls.
